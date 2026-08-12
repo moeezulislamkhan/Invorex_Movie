@@ -217,21 +217,37 @@ class _DetailsBody extends StatelessWidget {
                 children: [
                   Expanded(
                     child: FilledButton.icon(
-                      onPressed: details.trailerKey == null
-                          ? null
-                          : () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => WatchScreen(
-                                    title: details.title,
-                                    trailerKey: details.trailerKey!,
-                                  ),
-                                ),
+                      onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => WatchScreen(
+                                title: details.title,
+                                videoId: details.muxVideoId,
+                                trailerKey: details.trailerKey,
                               ),
-                      icon: const Icon(Icons.play_arrow_rounded),
-                      label: const Text('Watch Trailer'),
+                            ),
+                          ),
+                      icon: const Icon(Icons.play_circle_filled_rounded),
+                      label: const Text('Watch Now'),
                     ),
                   ),
+                  const SizedBox(width: 10),
+                  if (details.trailerKey != null && details.trailerKey!.isNotEmpty)
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => WatchScreen(
+                                  title: details.title,
+                                  trailerKey: details.trailerKey,
+                                ),
+                              ),
+                            ),
+                        icon: const Icon(Icons.movie_filter_rounded),
+                        label: const Text('Trailer'),
+                      ),
+                    ),
                   const SizedBox(width: 10),
                   IconButton.filledTonal(
                     onPressed: () => watchlist.toggle(details),

@@ -12,6 +12,7 @@ class MediaItem {
     required this.releaseDate,
     required this.genreIds,
     this.popularity = 0,
+    this.muxVideoId,
   });
 
   final int id;
@@ -24,6 +25,7 @@ class MediaItem {
   final String releaseDate;
   final List<int> genreIds;
   final double popularity;
+  final String? muxVideoId;
 
   factory MediaItem.fromJson(
     Map<String, dynamic> json, {

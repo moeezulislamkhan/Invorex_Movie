@@ -11,6 +11,7 @@ import '../widgets/section_header.dart';
 import '../widgets/shimmer_placeholder.dart';
 import 'details_screen.dart';
 import 'explore_screen.dart';
+import 'watch_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -170,62 +171,101 @@ class _FeaturedCarouselState extends State<_FeaturedCarousel> {
                 child: BackdropImage(
                   path: item.backdropPath ?? item.posterPath,
                   height: 330,
-                  child: Align(
-                    alignment: Alignment.bottomLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.primary,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Text(
-                              'TRENDING',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 1,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            item.title,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 27,
-                              height: 1.05,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Align(
+                        alignment: Alignment.bottomLeft,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Icon(
-                                Icons.star_rounded,
-                                color: Color(0xFFFFC857),
-                                size: 18,
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Text(
+                                  'TRENDING',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 1,
+                                  ),
+                                ),
                               ),
-                              const SizedBox(width: 4),
-                              Text(item.rating.toStringAsFixed(1)),
-                              const SizedBox(width: 10),
-                              Text(item.year),
-                              const SizedBox(width: 10),
-                              Text(item.typeLabel),
+                              const SizedBox(height: 10),
+                              Text(
+                                item.title,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 27,
+                                  height: 1.05,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.star_rounded,
+                                    color: Color(0xFFFFC857),
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(item.rating.toStringAsFixed(1)),
+                                  const SizedBox(width: 10),
+                                  Text(item.year),
+                                  const SizedBox(width: 10),
+                                  Text(item.typeLabel),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              SizedBox(
+                                height: 40,
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: FilledButton.icon(
+                                        onPressed: () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => WatchScreen(
+                                              title: item.title,
+                                              videoId: item.muxVideoId,
+                                            ),
+                                          ),
+                                        ),
+                                        icon: const Icon(Icons.play_circle_filled_rounded, size: 18),
+                                        label: const Text('Watch'),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: OutlinedButton(
+                                        onPressed: () => Navigator.pushNamed(
+                                          context,
+                                          DetailsScreen.routeName,
+                                          arguments: item,
+                                        ),
+                                        child: const Text('Details'),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),

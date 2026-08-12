@@ -11,16 +11,13 @@ A Flutter + Material 3 university project for movie/TV discovery.
 
 ## API setup
 
-Open:
-
-`lib/config/api_config.dart`
-
-Set:
+The app is configured for the MUX Video API environment key:
 
 ```dart
-static const String tmdbBearerToken = 'YOUR_TMDB_READ_ACCESS_TOKEN';
-
+static const String muxEnvironmentKey = 'sl8n1m2ua5tglem2ntg9nhd0f';
 ```
+
+The app still keeps the TMDB metadata token for discovery and image metadata, but the MUX video API is now the primary video source configuration.
 
 Do not commit real production secrets to a public repository.
 

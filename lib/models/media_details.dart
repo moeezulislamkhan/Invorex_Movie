@@ -12,6 +12,7 @@ class MediaDetails extends MediaItem {
     required super.releaseDate,
     required super.genreIds,
     super.popularity,
+    super.muxVideoId,
     this.runtime,
     this.genres = const [],
     this.numberOfSeasons,
@@ -63,6 +64,11 @@ class MediaDetails extends MediaItem {
     }
 
     final base = MediaItem.fromJson(json, forcedType: type);
+    
+    // Generate a muxVideoId for demonstration
+    // In production, fetch this from your backend/MUX API
+    final muxVideoId = 'mux_${type.name}_${base.id}';
+    
     return MediaDetails(
       id: base.id,
       type: base.type,
@@ -74,6 +80,7 @@ class MediaDetails extends MediaItem {
       releaseDate: base.releaseDate,
       genreIds: base.genreIds,
       popularity: base.popularity,
+      muxVideoId: muxVideoId,
       runtime: (json['runtime'] as num?)?.toInt(),
       genres: ((json['genres'] as List?) ?? const [])
           .whereType<Map>()

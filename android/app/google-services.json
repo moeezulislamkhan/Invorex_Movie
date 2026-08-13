@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "992799860188",
+    "project_id": "invorex-movies",
+    "storage_bucket": "invorex-movies.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:992799860188:android:070efccc8ba00fbcf05b19",
+        "android_client_info": {
+          "package_name": "com.example.invorex_movies_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBYY_spUuvhtI93nxn-aLGaroZtuFmqFl4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

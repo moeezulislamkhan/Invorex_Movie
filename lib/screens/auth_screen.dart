@@ -32,36 +32,47 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   Future<void> _submit() async {
-    final name = nameController.text.trim();
-    final email = emailController.text.trim();
-    final password = passwordController.text;
+  final name = nameController.text.trim();
+  final email = emailController.text.trim();
+  final password = passwordController.text;
 
-    if (!loginMode && name.isEmpty) {
-      _show('Please enter your name.');
-      return;
-    }
-    if (email.isEmpty || !email.contains('@')) {
-      _show('Please enter a valid email.');
-      return;
-    }
-    if (password.length < 4) {
-      _show('Password must contain at least 4 characters.');
-      return;
-    }
-    if (!loginMode && password != confirmController.text) {
-      _show('Passwords do not match.');
-      return;
-    }
+  if (!loginMode && name.isEmpty) {
+    _show('Please enter your name.');
+    return;
+  }
 
-    setState(() => loading = true);
+  if (email.isEmpty || !email.contains('@')) {
+    _show('Please enter a valid email.');
+    return;
+  }
 
+  if (password.length < 4) {
+    _show('Password must contain at least 4 characters.');
+    return;
+  }
+
+  if (!loginMode && password != confirmController.text) {
+    _show('Passwords do not match.');
+    return;
+  }
+
+  setState(() => loading = true);
+
+  try {
     final auth = context.read<AuthProvider>();
-    bool success;
+    bool success = false;
 
     if (loginMode) {
-      success = await auth.login(email: email, password: password);
+      success = await auth.login(
+        email: email,
+        password: password,
+      );
+
       if (!success) {
-        _show('Account not found. Create an account first.');
+        if (mounted) {
+          _show('Account not found or invalid email/password.');
+        }
+        return;
       }
     } else {
       await auth.signUp(
@@ -69,20 +80,35 @@ class _AuthScreenState extends State<AuthScreen> {
         email: email,
         password: password,
       );
+
       success = true;
     }
 
     if (!mounted) return;
-    setState(() => loading = false);
 
     if (success) {
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (_) => const MainShell()),
+        MaterialPageRoute(
+          builder: (_) => const MainShell(),
+        ),
         (_) => false,
       );
     }
+  } catch (e) {
+    if (!mounted) return;
+
+    debugPrint('Authentication Error: $e');
+
+    _show(
+      e.toString().replaceFirst('Exception: ', ''),
+    );
+  } finally {
+    if (mounted) {
+      setState(() => loading = false);
+    }
   }
+}
 
   void _show(String message) {
     ScaffoldMessenger.of(context).showSnackBar(

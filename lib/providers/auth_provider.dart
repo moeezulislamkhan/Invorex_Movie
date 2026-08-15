@@ -57,13 +57,15 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> signUp({
-    required String name,
-    required String email,
-    required String password,
-  }) async {
-    final cleanName = name.trim();
-    final cleanEmail = email.trim();
+  required String name,
+  required String email,
+  required String password,
+}) async {
+  final cleanName = name.trim();
+  final cleanEmail = email.trim();
 
+  try {
+    // 1. Firebase Authentication account create
     final credential = await _auth.createUserWithEmailAndPassword(
       email: cleanEmail,
       password: password,
@@ -75,14 +77,14 @@ class AuthProvider extends ChangeNotifier {
       throw Exception('Account creation failed.');
     }
 
-    await user.updateDisplayName(cleanName);
+    // 2. Update Firebase Auth display name
+    try {
+      await user.updateDisplayName(cleanName);
+    } catch (e) {
+      debugPrint('Display name update error: $e');
+    }
 
-    await _firestore.collection('users').doc(user.uid).set({
-      'name': cleanName,
-      'email': cleanEmail,
-      'createdAt': FieldValue.serverTimestamp(),
-    });
-
+    // 3. Update local state immediately
     _name = cleanName;
     _email = cleanEmail;
     _loggedIn = true;
@@ -95,7 +97,42 @@ class AuthProvider extends ChangeNotifier {
     await _storage.setLoggedIn(true);
 
     notifyListeners();
+
+    // 4. Firestore profile background mein save karo.
+    // Signup ko Firestore ke response ka wait nahi karna.
+    _saveFirestoreProfile(
+      uid: user.uid,
+      name: cleanName,
+      email: cleanEmail,
+    );
+  } on FirebaseAuthException catch (e) {
+    debugPrint('Firebase Signup Error: ${e.code}');
+    debugPrint('Firebase Signup Message: ${e.message}');
+
+    throw Exception(e.message ?? 'Account creation failed.');
+  } catch (e) {
+    debugPrint('Signup Error: $e');
+    rethrow;
   }
+}
+
+Future<void> _saveFirestoreProfile({
+  required String uid,
+  required String name,
+  required String email,
+}) async {
+  try {
+    await _firestore.collection('users').doc(uid).set({
+      'name': name,
+      'email': email,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+
+    debugPrint('Firestore profile saved successfully.');
+  } catch (e) {
+    debugPrint('Firestore profile save error: $e');
+  }
+}
 
  Future<bool> login({
   required String email,

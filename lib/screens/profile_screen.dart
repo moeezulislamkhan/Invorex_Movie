@@ -87,7 +87,7 @@ class ProfileScreen extends StatelessWidget {
             icon: Icons.edit_outlined,
             title: 'Edit Profile',
             subtitle: 'Update your display information',
-            onTap: () => _showInfo(context, 'Profile editing can be connected to Firebase later.'),
+         onTap: () => _editProfile(context),
           ),
           _item(
             context,
@@ -159,6 +159,110 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
+Future<void> _editProfile(BuildContext context) async {
+  final auth = context.read<AuthProvider>();
+
+  final controller = TextEditingController(
+    text: auth.name,
+  );
+
+  await showDialog(
+    context: context,
+    builder: (dialogContext) {
+      bool saving = false;
+
+      return StatefulBuilder(
+        builder: (context, setDialogState) {
+          return AlertDialog(
+            title: const Text('Edit Profile'),
+            content: TextField(
+              controller: controller,
+              decoration: const InputDecoration(
+                labelText: 'Name',
+                prefixIcon: Icon(Icons.person_outline_rounded),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: saving
+                    ? null
+                    : () {
+                        Navigator.pop(dialogContext);
+                      },
+                child: const Text('Cancel'),
+              ),
+              FilledButton(
+                onPressed: saving
+                    ? null
+                    : () async {
+                        final name = controller.text.trim();
+
+                        if (name.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Please enter your name.'),
+                            ),
+                          );
+                          return;
+                        }
+
+                        setDialogState(() {
+                          saving = true;
+                        });
+
+                        try {
+                          await auth.updateProfile(
+                            name: name,
+                          );
+
+                          if (dialogContext.mounted) {
+                            Navigator.pop(dialogContext);
+                          }
+
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Profile updated successfully.',
+                                ),
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          setDialogState(() {
+                            saving = false;
+                          });
+
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Failed to update profile: $e',
+                                ),
+                              ),
+                            );
+                          }
+                        }
+                      },
+                child: saving
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text('Save'),
+              ),
+            ],
+          );
+        },
+      );
+    },
+  );
+
+  controller.dispose();
+}
   void _showInfo(BuildContext context, String message) {
     showModalBottomSheet(
       context: context,

@@ -64,7 +64,11 @@ class _AuthScreenState extends State<AuthScreen> {
         _show('Account not found. Create an account first.');
       }
     } else {
-      await auth.signUp(name: name, email: email);
+      await auth.signUp(
+        name: name,
+        email: email,
+        password: password,
+      );
       success = true;
     }
 
@@ -124,7 +128,12 @@ class _AuthScreenState extends State<AuthScreen> {
                     loginMode
                         ? 'Sign in to continue your cinematic journey.'
                         : 'Join Invorex Movies and build your watchlist.',
-                    style: TextStyle(color: Theme.of(context).colorScheme.onBackground.withOpacity(0.6), fontSize: 15),
+                    style: TextStyle(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onBackground
+                            .withOpacity(0.6),
+                        fontSize: 15),
                   ),
                   const SizedBox(height: 30),
                   if (!loginMode) ...[

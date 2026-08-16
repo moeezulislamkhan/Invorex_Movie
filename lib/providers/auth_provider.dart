@@ -12,15 +12,17 @@ class AuthProvider extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  bool _initialized = false;
-  bool _loggedIn = false;
-  String _name = 'Guest';
-  String _email = '';
+bool _initialized = false;
+bool _loggedIn = false;
+String _name = 'Guest';
+String _email = '';
+String? _profileImagePath;
 
-  bool get initialized => _initialized;
-  bool get loggedIn => _loggedIn;
-  String get name => _name;
-  String get email => _email;
+ bool get initialized => _initialized;
+bool get loggedIn => _loggedIn;
+String get name => _name;
+String get email => _email;
+String? get profileImagePath => _profileImagePath;
 
   Future<bool> onboardingComplete() => _storage.onboardingComplete;
 
@@ -32,8 +34,10 @@ class AuthProvider extends ChangeNotifier {
   // LOAD USER
   // =========================
 
-  Future<void> load() async {
-    final user = _auth.currentUser;
+Future<void> load() async {
+  _profileImagePath = await _storage.profileImagePath;
+
+  final user = _auth.currentUser;
 
     if (user != null) {
       _loggedIn = true;
@@ -229,7 +233,17 @@ Future<void> _saveFirestoreProfile({
       debugPrint('Firestore profile error: $e');
     }
   }
+// =========================
+// LOCAL PROFILE IMAGE
+// =========================
 
+Future<void> setProfileImage(String path) async {
+  _profileImagePath = path;
+
+  await _storage.saveProfileImagePath(path);
+
+  notifyListeners();
+}
   // =========================
   // UPDATE PROFILE
   // =========================

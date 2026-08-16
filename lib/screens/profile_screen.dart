@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../config/app_config.dart';
@@ -18,7 +22,50 @@ class ProfileScreen extends StatelessWidget {
       (_) => false,
     );
   }
+Future<void> _pickProfileImage(BuildContext context) async {
+  try {
+    final picker = ImagePicker();
 
+    final image = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 85,
+      maxWidth: 1000,
+    );
+
+    if (image == null) return;
+
+    final directory = await getApplicationDocumentsDirectory();
+
+    final extension = image.path.split('.').last;
+
+    final targetPath =
+        '${directory.path}/profile_image.$extension';
+
+    final copiedImage = await File(image.path).copy(targetPath);
+
+    if (!context.mounted) return;
+
+    await context.read<AuthProvider>().setProfileImage(
+          copiedImage.path,
+        );
+
+    if (!context.mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Profile image updated successfully.'),
+      ),
+    );
+  } catch (e) {
+    if (!context.mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Failed to update profile image: $e'),
+      ),
+    );
+  }
+}
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
@@ -47,17 +94,46 @@ class ProfileScreen extends StatelessWidget {
             ),
             child: Row(
               children: [
-                CircleAvatar(
-                  radius: 34,
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  child: Text(
-                    auth.name.isEmpty ? 'G' : auth.name[0].toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
+               GestureDetector(
+  onTap: () => _pickProfileImage(context),
+  child: Stack(
+    alignment: Alignment.bottomRight,
+    children: [
+      CircleAvatar(
+        radius: 34,
+        backgroundColor:
+            Theme.of(context).colorScheme.primary,
+        backgroundImage: auth.profileImagePath != null
+            ? FileImage(
+                File(auth.profileImagePath!),
+              )
+            : null,
+        child: auth.profileImagePath == null
+            ? Text(
+                auth.name.isEmpty
+                    ? 'G'
+                    : auth.name[0].toUpperCase(),
+                style: const TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w900,
                 ),
+              )
+            : null,
+      ),
+      Container(
+        padding: const EdgeInsets.all(5),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.primary,
+          shape: BoxShape.circle,
+        ),
+        child: const Icon(
+          Icons.camera_alt_rounded,
+          size: 15,
+        ),
+      ),
+    ],
+  ),
+),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(

@@ -1,5 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
-
+ 
 class LocalStorageService {
   LocalStorageService();
 
@@ -11,6 +11,16 @@ class LocalStorageService {
   static const _userEmailKey = 'user_email';
   static const _watchlistKey = 'watchlist_keys';
   static const _themeDarkKey = 'theme_dark';
+  static const _profileImagePathKey = 'profile_image_path';
+
+  Future<String?> get profileImagePath =>
+    _prefs.getString(_profileImagePathKey);
+
+Future<void> saveProfileImagePath(String path) =>
+    _prefs.setString(_profileImagePathKey, path);
+
+Future<void> removeProfileImagePath() =>
+    _prefs.remove(_profileImagePathKey);
 
   Future<bool> get onboardingComplete async =>
       await _prefs.getBool(_onboardingKey) ?? false;

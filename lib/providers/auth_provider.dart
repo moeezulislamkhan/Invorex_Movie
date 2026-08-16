@@ -24,7 +24,13 @@ class AuthProvider extends ChangeNotifier {
 
   Future<bool> onboardingComplete() => _storage.onboardingComplete;
 
-  Future<void> setOnboardingComplete() => _storage.setOnboardingComplete(true);
+  Future<void> setOnboardingComplete() async {
+    await _storage.setOnboardingComplete(true);
+  }
+
+  // =========================
+  // LOAD USER
+  // =========================
 
   Future<void> load() async {
     final user = _auth.currentUser;
@@ -34,16 +40,22 @@ class AuthProvider extends ChangeNotifier {
       _email = user.email ?? '';
 
       try {
-        final doc = await _firestore.collection('users').doc(user.uid).get();
+        final doc = await _firestore
+            .collection('users')
+            .doc(user.uid)
+            .get();
 
         if (doc.exists) {
           final data = doc.data();
 
-          _name = data?['name'] ?? user.displayName ?? 'Movie Lover';
+          _name = data?['name'] ??
+              user.displayName ??
+              'Movie Lover';
         } else {
           _name = user.displayName ?? 'Movie Lover';
         }
-      } catch (_) {
+      } catch (e) {
+        debugPrint('Load profile error: $e');
         _name = user.displayName ?? 'Movie Lover';
       }
     } else {
@@ -55,6 +67,10 @@ class AuthProvider extends ChangeNotifier {
     _initialized = true;
     notifyListeners();
   }
+
+  // =========================
+  // SIGN UP
+  // =========================
 
   Future<void> signUp({
   required String name,
@@ -98,8 +114,7 @@ class AuthProvider extends ChangeNotifier {
 
     notifyListeners();
 
-    // 4. Firestore profile background mein save karo.
-    // Signup ko Firestore ke response ka wait nahi karna.
+    // 4. Firestore profile background mein save karo
     _saveFirestoreProfile(
       uid: user.uid,
       name: cleanName,
@@ -115,7 +130,6 @@ class AuthProvider extends ChangeNotifier {
     rethrow;
   }
 }
-
 Future<void> _saveFirestoreProfile({
   required String uid,
   required String name,
@@ -134,120 +148,152 @@ Future<void> _saveFirestoreProfile({
   }
 }
 
- Future<bool> login({
-  required String email,
-  required String password,
-}) async {
-  if (email.trim().isEmpty || password.isEmpty) {
-    return false;
-  }
+  // =========================
+  // LOGIN
+  // =========================
 
-  try {
-    // Firebase Authentication
-    final credential = await _auth.signInWithEmailAndPassword(
-      email: email.trim(),
-      password: password,
-    );
-
-    final user = credential.user;
-
-    if (user == null) {
+  Future<bool> login({
+    required String email,
+    required String password,
+  }) async {
+    if (email.trim().isEmpty || password.isEmpty) {
       return false;
     }
 
-    // Firebase Auth successful
-    _email = user.email ?? email.trim();
-    _name = user.displayName ?? 'Movie Lover';
-    _loggedIn = true;
+    try {
+      final credential =
+          await _auth.signInWithEmailAndPassword(
+        email: email.trim(),
+        password: password,
+      );
 
-    // Local storage
-    await _storage.saveUser(
-      name: _name,
-      email: _email,
-    );
+      final user = credential.user;
 
-    await _storage.setLoggedIn(true);
+      if (user == null) {
+        return false;
+      }
 
-    notifyListeners();
-
-    // Firestore ko background mein load karo
-    _loadFirestoreProfile(user.uid);
-
-    return true;
-  } on FirebaseAuthException catch (e) {
-    debugPrint('Firebase Login Error: ${e.code}');
-    debugPrint('Firebase Login Message: ${e.message}');
-    return false;
-  } catch (e) {
-    debugPrint('Login Error: $e');
-    return false;
-  }
-}
-
-Future<void> _loadFirestoreProfile(String uid) async {
-  try {
-    final doc = await _firestore
-        .collection('users')
-        .doc(uid)
-        .get();
-
-    if (doc.exists) {
-      final data = doc.data();
-
-      _name = data?['name'] ??
-          _auth.currentUser?.displayName ??
-          'Movie Lover';
+      _email = user.email ?? email.trim();
+      _name = user.displayName ?? 'Movie Lover';
+      _loggedIn = true;
 
       await _storage.saveUser(
         name: _name,
         email: _email,
       );
 
+      await _storage.setLoggedIn(true);
+
       notifyListeners();
+
+      // Firestore background mein load hoga
+      _loadFirestoreProfile(user.uid);
+
+      return true;
+    } on FirebaseAuthException catch (e) {
+      debugPrint('Firebase Login Error: ${e.code}');
+      debugPrint('Firebase Login Message: ${e.message}');
+      return false;
+    } catch (e) {
+      debugPrint('Login Error: $e');
+      return false;
     }
+  }
+
+  // =========================
+  // FIRESTORE PROFILE
+  // =========================
+
+  Future<void> _loadFirestoreProfile(String uid) async {
+    try {
+      final doc = await _firestore
+          .collection('users')
+          .doc(uid)
+          .get();
+
+      if (doc.exists) {
+        final data = doc.data();
+
+        _name = data?['name'] ??
+            _auth.currentUser?.displayName ??
+            'Movie Lover';
+
+        await _storage.saveUser(
+          name: _name,
+          email: _email,
+        );
+
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('Firestore profile error: $e');
+    }
+  }
+
+  // =========================
+  // UPDATE PROFILE
+  // =========================
+
+ Future<void> updateProfile({
+  required String name,
+}) async {
+  final user = _auth.currentUser;
+
+  if (user == null) {
+    throw Exception('User is not logged in.');
+  }
+
+  final cleanName = name.trim();
+
+  if (cleanName.isEmpty) {
+    throw Exception('Name cannot be empty.');
+  }
+
+  // UI immediately update
+  _name = cleanName;
+  notifyListeners();
+
+  // Local storage immediately update
+  await _storage.saveUser(
+    name: cleanName,
+    email: _email,
+  );
+
+  // Firebase background update
+  _updateFirebaseProfile(
+    user: user,
+    name: cleanName,
+  );
+}
+
+ Future<void> _updateFirebaseProfile({
+  required User user,
+  required String name,
+}) async {
+  try {
+    await Future.wait([
+      user.updateDisplayName(name),
+      _firestore
+          .collection('users')
+          .doc(user.uid)
+          .set(
+        {
+          'name': name,
+          'email': user.email ?? _email,
+        },
+        SetOptions(merge: true),
+      ),
+    ]);
+
+    debugPrint('Profile updated on Firebase.');
   } catch (e) {
-    debugPrint('Firestore profile error: $e');
+    debugPrint('Firebase profile update error: $e');
   }
 }
 
-  Future<void> updateProfile({
-    required String name,
-  }) async {
-    final user = _auth.currentUser;
-
-    if (user == null) {
-      throw Exception('User is not logged in.');
-    }
-
-    final cleanName = name.trim();
-
-    if (cleanName.isEmpty) {
-      throw Exception('Name cannot be empty.');
-    }
-
-    // Firebase Authentication mein name update
-    await user.updateDisplayName(cleanName);
-
-    // Firestore mein user ka name update
-    await _firestore.collection('users').doc(user.uid).set(
-      {
-        'name': cleanName,
-        'email': user.email ?? _email,
-      },
-      SetOptions(merge: true),
-    );
-
-    // Local state update
-    _name = cleanName;
-
-    // Local storage update
-    await _storage.saveUser(
-      name: _name,
-      email: _email,
-    );
-
-    notifyListeners();
-  }
+  // =========================
+  // LOGOUT
+  // =========================
 
   Future<void> logout() async {
     await _auth.signOut();

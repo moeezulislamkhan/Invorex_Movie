@@ -166,102 +166,71 @@ Future<void> _editProfile(BuildContext context) async {
     text: auth.name,
   );
 
-  await showDialog(
+  final name = await showDialog<String>(
     context: context,
     builder: (dialogContext) {
-      bool saving = false;
+      return AlertDialog(
+        title: const Text('Edit Profile'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          textInputAction: TextInputAction.done,
+          decoration: const InputDecoration(
+            labelText: 'Name',
+            prefixIcon: Icon(Icons.person_outline_rounded),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+            },
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              final value = controller.text.trim();
 
-      return StatefulBuilder(
-        builder: (context, setDialogState) {
-          return AlertDialog(
-            title: const Text('Edit Profile'),
-            content: TextField(
-              controller: controller,
-              decoration: const InputDecoration(
-                labelText: 'Name',
-                prefixIcon: Icon(Icons.person_outline_rounded),
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: saving
-                    ? null
-                    : () {
-                        Navigator.pop(dialogContext);
-                      },
-                child: const Text('Cancel'),
-              ),
-              FilledButton(
-                onPressed: saving
-                    ? null
-                    : () async {
-                        final name = controller.text.trim();
+              if (value.isEmpty) {
+                return;
+              }
 
-                        if (name.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Please enter your name.'),
-                            ),
-                          );
-                          return;
-                        }
-
-                        setDialogState(() {
-                          saving = true;
-                        });
-
-                        try {
-                          await auth.updateProfile(
-                            name: name,
-                          );
-
-                          if (dialogContext.mounted) {
-                            Navigator.pop(dialogContext);
-                          }
-
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'Profile updated successfully.',
-                                ),
-                              ),
-                            );
-                          }
-                        } catch (e) {
-                          setDialogState(() {
-                            saving = false;
-                          });
-
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Failed to update profile: $e',
-                                ),
-                              ),
-                            );
-                          }
-                        }
-                      },
-                child: saving
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                        ),
-                      )
-                    : const Text('Save'),
-              ),
-            ],
-          );
-        },
+              Navigator.of(dialogContext).pop(value);
+            },
+            child: const Text('Save'),
+          ),
+        ],
       );
     },
   );
 
   controller.dispose();
+
+  if (name == null || name.trim().isEmpty) {
+    return;
+  }
+
+  try {
+    await auth.updateProfile(
+      name: name.trim(),
+    );
+
+    if (!context.mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Profile updated successfully.'),
+      ),
+    );
+  } catch (e) {
+    if (!context.mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Failed to update profile: $e'),
+      ),
+    );
+  }
 }
   void _showInfo(BuildContext context, String message) {
     showModalBottomSheet(

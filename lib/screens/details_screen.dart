@@ -207,7 +207,7 @@ class _DetailsBody extends StatelessWidget {
                     ? 'No overview is available for this title.'
                     : details.overview,
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onBackground.withOpacity(0.7),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                   height: 1.55,
                   fontSize: 15,
                 ),
@@ -271,7 +271,7 @@ class _DetailsBody extends StatelessWidget {
                 Text(
                   details.cast.join(' • '),
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.onBackground.withOpacity(0.7),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                     height: 1.5,
                   ),
                 ),
@@ -319,7 +319,7 @@ class _DetailsBody extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 17, color: Theme.of(context).colorScheme.onBackground.withOpacity(0.54)),
+        Icon(icon, size: 17, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
         const SizedBox(width: 5),
         Text(label),
       ],
@@ -375,7 +375,7 @@ class _EpisodeList extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Text(
           'Select a season above to load episodes.',
-          style: TextStyle(color: Theme.of(context).colorScheme.onBackground.withOpacity(0.54)),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
         ),
       );
     }
@@ -392,7 +392,7 @@ class _EpisodeList extends StatelessWidget {
         if (snapshot.hasError) {
           return Text(
             snapshot.error.toString().replaceFirst('ApiException: ', ''),
-            style: TextStyle(color: Theme.of(context).colorScheme.onBackground.withOpacity(0.54)),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
           );
         }
 
@@ -400,7 +400,7 @@ class _EpisodeList extends StatelessWidget {
         if (episodes.isEmpty) {
           return Text(
             'No episodes available for this season.',
-            style: TextStyle(color: Theme.of(context).colorScheme.onBackground.withOpacity(0.54)),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
           );
         }
 

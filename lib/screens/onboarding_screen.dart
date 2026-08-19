@@ -107,7 +107,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           style: TextStyle(
                             fontSize: 16,
                             height: 1.5,
-                            color: Theme.of(context).colorScheme.onBackground.withOpacity(0.6),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                           ),
                         ),
                       ],
@@ -128,7 +128,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     decoration: BoxDecoration(
                     color: i == _index
                         ? AppTheme.primary
-                        : Theme.of(context).colorScheme.onBackground.withOpacity(0.24),
+                        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24),
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),

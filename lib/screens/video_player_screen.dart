@@ -125,7 +125,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                 Text(
                                   'Now Playing',
                                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                        color: Theme.of(context).colorScheme.onBackground.withOpacity(0.7),
+                                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                       ),
                                 ),
                               ],

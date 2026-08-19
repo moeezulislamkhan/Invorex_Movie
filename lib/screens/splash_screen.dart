@@ -114,7 +114,7 @@ class _SplashScreenState extends State<SplashScreen>
                       fit: BoxFit.contain,
                       errorBuilder: (context, _, __) => Icon(
                         Icons.local_movies_rounded,
-                        color: Theme.of(context).colorScheme.onBackground.withOpacity(0.7),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                         size: 56,
                       ),
                     ),
@@ -132,7 +132,7 @@ class _SplashScreenState extends State<SplashScreen>
                   Text(
                     'DISCOVER • WATCH • EXPERIENCE',
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onBackground.withOpacity(0.54),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
                       letterSpacing: 2.1,
                       fontSize: 11,
                     ),

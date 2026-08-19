@@ -164,7 +164,7 @@ class _ResultGrid extends StatelessWidget {
                   const SizedBox(width: 3),
                   Text(item.rating.toStringAsFixed(1)),
                   const SizedBox(width: 8),
-                  Text(item.year, style: TextStyle(color: Theme.of(context).colorScheme.onBackground.withOpacity(0.54))),
+                  Text(item.year, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
                 ],
               ),
             ],

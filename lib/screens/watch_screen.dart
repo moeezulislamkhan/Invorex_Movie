@@ -165,7 +165,7 @@ class _WatchScreenState extends State<WatchScreen> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.1),
+                          color: Colors.red.withValues(alpha: 0.1),
                           border: Border.all(color: Colors.red),
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -180,7 +180,7 @@ class _WatchScreenState extends State<WatchScreen> {
                             ? 'Click the play button to watch the video. This streams from MUX Video API.'
                             : 'This button opens the trailer from its legal external video source. Invorex Movies does not host or distribute copyrighted movie files.',
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onBackground.withOpacity(0.6),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                           height: 1.5,
                         ),
                       ),

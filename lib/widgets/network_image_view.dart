@@ -61,7 +61,7 @@ class _NetworkImageViewState extends State<NetworkImageView> {
         child: Container(
           color: widget.backgroundColor,
           alignment: Alignment.center,
-          child: Icon(widget.placeholderIcon, color: Theme.of(context).colorScheme.onBackground.withOpacity(0.38)),
+          child: Icon(widget.placeholderIcon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
         ),
       );
     }
@@ -76,11 +76,11 @@ class _NetworkImageViewState extends State<NetworkImageView> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.wifi_off_rounded, color: Theme.of(context).colorScheme.onBackground.withOpacity(0.38), size: 22),
+                Icon(Icons.wifi_off_rounded, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), size: 22),
                 const SizedBox(height: 4),
                 Text(
                   'Tap to retry',
-                  style: TextStyle(color: Theme.of(context).colorScheme.onBackground.withOpacity(0.38), fontSize: 10),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 10),
                 ),
               ],
             ),
@@ -129,7 +129,7 @@ class _NetworkImageViewState extends State<NetworkImageView> {
               child: Container(
                 color: widget.backgroundColor,
                 alignment: Alignment.center,
-                child: Icon(Icons.broken_image_outlined, color: Theme.of(context).colorScheme.onBackground.withOpacity(0.38)),
+                child: Icon(Icons.broken_image_outlined, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
               ),
             );
       },

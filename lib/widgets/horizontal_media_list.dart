@@ -104,7 +104,7 @@ class _HorizontalMediaListState extends State<HorizontalMediaList> {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface.withOpacity(0.6),
+                  color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.6),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.chevron_left_rounded),
@@ -120,7 +120,7 @@ class _HorizontalMediaListState extends State<HorizontalMediaList> {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface.withOpacity(0.6),
+                  color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.6),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.chevron_right_rounded),

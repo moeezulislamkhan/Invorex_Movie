@@ -44,7 +44,7 @@ class HomeScreen extends StatelessWidget {
                       const SizedBox(height: 5),
                       Text(
                         'What do you want to watch today?',
-                        style: TextStyle(color: Theme.of(context).colorScheme.onBackground.withOpacity(0.6)),
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
                       ),
                       const SizedBox(height: 18),
                       GestureDetector(

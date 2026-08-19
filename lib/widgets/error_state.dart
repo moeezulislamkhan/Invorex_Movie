@@ -18,7 +18,7 @@ class ErrorState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.cloud_off_rounded, size: 52, color: Theme.of(context).colorScheme.onBackground.withOpacity(0.38)),
+            Icon(Icons.cloud_off_rounded, size: 52, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
             const SizedBox(height: 16),
             const Text(
               'Something went wrong',
@@ -28,7 +28,7 @@ class ErrorState extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(color: Theme.of(context).colorScheme.onBackground.withOpacity(0.6)),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
             ),
             const SizedBox(height: 18),
             FilledButton.icon(

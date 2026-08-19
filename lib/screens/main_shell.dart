@@ -43,12 +43,12 @@ class _MainShellState extends State<MainShell> {
       floatingActionButton: FloatingActionButton(
         onPressed: () => context.read<ThemeProvider>().toggle(),
         backgroundColor: Theme.of(context).colorScheme.primary,
+        tooltip: 'Toggle Theme',
         child: Icon(
           context.watch<ThemeProvider>().isDark
               ? Icons.dark_mode_rounded
               : Icons.light_mode_rounded,
         ),
-        tooltip: 'Toggle Theme',
       ),
       body: IndexedStack(index: index, children: pages),
       bottomNavigationBar: NavigationBar(

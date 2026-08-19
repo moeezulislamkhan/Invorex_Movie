@@ -233,22 +233,6 @@ class _FeaturedCarouselState extends State<_FeaturedCarousel> {
                                 child: Row(
                                   children: [
                                     Expanded(
-                                      child: FilledButton.icon(
-                                        onPressed: () => Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => WatchScreen(
-                                              title: item.title,
-                                              videoId: item.muxVideoId,
-                                            ),
-                                          ),
-                                        ),
-                                        icon: const Icon(Icons.play_circle_filled_rounded, size: 18),
-                                        label: const Text('Watch'),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Expanded(
                                       child: OutlinedButton(
                                         onPressed: () => Navigator.pushNamed(
                                           context,

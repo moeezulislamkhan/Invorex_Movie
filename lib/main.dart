@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'config/app_config.dart';
 import 'models/media_item.dart';
 import 'providers/auth_provider.dart';
@@ -11,19 +12,22 @@ import 'providers/theme_provider.dart';
 import 'screens/details_screen.dart';
 import 'screens/splash_screen.dart';
 import 'services/local_storage_service.dart';
-import 'services/mux_video_api_service.dart';
 import 'services/tmdb_api_service.dart';
 import 'theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Initialize Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   final storage = LocalStorageService();
   final auth = AuthProvider(storage);
   await auth.load();
 
   final api = TmdbApiService();
-  final muxApi = MuxVideoApiService();
 
   final theme = ThemeProvider(storage);
   await theme.load();
@@ -33,7 +37,6 @@ Future<void> main() async {
       providers: [
         Provider<LocalStorageService>.value(value: storage),
         Provider<TmdbApiService>.value(value: api),
-        Provider<MuxVideoApiService>.value(value: muxApi),
         ChangeNotifierProvider<AuthProvider>.value(value: auth),
         ChangeNotifierProvider<ThemeProvider>.value(value: theme),
         ChangeNotifierProvider(create: (_) => HomeProvider(api)),

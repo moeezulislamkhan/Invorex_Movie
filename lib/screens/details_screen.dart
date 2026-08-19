@@ -213,52 +213,45 @@ class _DetailsBody extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 22),
-              Row(
-                children: [
-                  Expanded(
-                    child: FilledButton.icon(
-                      onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => WatchScreen(
-                                title: details.title,
-                                videoId: details.muxVideoId,
-                                trailerKey: details.trailerKey,
-                              ),
-                            ),
-                          ),
-                      icon: const Icon(Icons.play_circle_filled_rounded),
-                      label: const Text('Watch Now'),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  if (details.trailerKey != null && details.trailerKey!.isNotEmpty)
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => WatchScreen(
-                                  title: details.title,
-                                  trailerKey: details.trailerKey,
-                                ),
-                              ),
-                            ),
-                        icon: const Icon(Icons.movie_filter_rounded),
-                        label: const Text('Trailer'),
-                      ),
-                    ),
-                  const SizedBox(width: 10),
-                  IconButton.filledTonal(
-                    onPressed: () => watchlist.toggle(details),
-                    icon: Icon(
-                      saved
-                          ? Icons.favorite_rounded
-                          : Icons.favorite_border_rounded,
-                    ),
-                  ),
-                ],
+             Row(
+  children: [
+    if (details.trailerKey != null &&
+        details.trailerKey!.isNotEmpty)
+      SizedBox(
+        height: 40,
+        width: 120,
+        child: OutlinedButton.icon(
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => WatchScreen(
+                title: details.title,
+                trailerKey: details.trailerKey,
               ),
+            ),
+          ),
+          icon: const Icon(
+            Icons.movie_filter_rounded,
+            size: 18,
+          ),
+          label: const Text('Trailer'),
+        ),
+      ),
+
+    if (details.trailerKey != null &&
+        details.trailerKey!.isNotEmpty)
+      const SizedBox(width: 10),
+
+    IconButton.filledTonal(
+      onPressed: () => watchlist.toggle(details),
+      icon: Icon(
+        saved
+            ? Icons.favorite_rounded
+            : Icons.favorite_border_rounded,
+      ),
+    ),
+  ],
+),
               if (details.cast.isNotEmpty) ...[
                 const SizedBox(height: 28),
                 Text(

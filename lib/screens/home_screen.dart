@@ -93,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
         if (!mounted) return;
 
         setState(() {
-          // After the 50th quote, start again
+          // After the last quote, start again
           // from the first quote.
           _subtitleIndex =
               (_subtitleIndex + 1) % _subtitles.length;
@@ -137,7 +137,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     8,
                   ),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
                     children: [
                       Text(
                         'Salam, ${auth.name} 👋',
@@ -217,9 +218,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: SectionHeader(
                     title: 'Trending Now',
                     actionLabel: 'See All',
-                    onAction: () => Navigator.of(context).push(
+                    onAction: () =>
+                        Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (_) => const ExploreScreen(),
+                        builder: (_) =>
+                            const ExploreScreen(),
                       ),
                     ),
                   ),
@@ -356,7 +359,8 @@ class _FeaturedCarouselState
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(26),
                 child: BackdropImage(
-                  path: item.backdropPath ?? item.posterPath,
+                  path: item.backdropPath ??
+                      item.posterPath,
                   height: 330,
                   child: Stack(
                     fit: StackFit.expand,
@@ -411,6 +415,7 @@ class _FeaturedCarouselState
 
                               // ==================================================
                               // MOVIE TITLE
+                              // WHITE IN BOTH LIGHT + DARK MODE
                               // ==================================================
 
                               Text(
@@ -419,6 +424,7 @@ class _FeaturedCarouselState
                                 overflow:
                                     TextOverflow.ellipsis,
                                 style: const TextStyle(
+                                  color: Colors.white,
                                   fontSize: 27,
                                   height: 1.05,
                                   fontWeight: FontWeight.w900,
@@ -429,6 +435,7 @@ class _FeaturedCarouselState
 
                               // ==================================================
                               // RATING / YEAR / TYPE
+                              // WHITE IN BOTH LIGHT + DARK MODE
                               // ==================================================
 
                               Row(
@@ -444,11 +451,19 @@ class _FeaturedCarouselState
                                   Text(
                                     item.rating
                                         .toStringAsFixed(1),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                    ),
                                   ),
 
                                   const SizedBox(width: 10),
 
-                                  Text(item.year),
+                                  Text(
+                                    item.year,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                  ),
 
                                   const SizedBox(width: 10),
 
@@ -457,6 +472,9 @@ class _FeaturedCarouselState
                                       item.typeLabel,
                                       overflow:
                                           TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -480,13 +498,15 @@ class _FeaturedCarouselState
                                   ),
                                   style: ButtonStyle(
                                     side: WidgetStateProperty
-                                        .resolveWith<BorderSide>(
+                                        .resolveWith<
+                                            BorderSide>(
                                       (states) {
                                         if (states.contains(
                                           WidgetState.hovered,
                                         )) {
                                           return BorderSide(
-                                            color: Theme.of(context)
+                                            color: Theme.of(
+                                                    context)
                                                 .colorScheme
                                                 .primary,
                                             width: 1.5,
@@ -494,7 +514,8 @@ class _FeaturedCarouselState
                                         }
 
                                         return BorderSide(
-                                          color: Theme.of(context)
+                                          color: Theme.of(
+                                                  context)
                                               .colorScheme
                                               .outline
                                               .withValues(
@@ -505,12 +526,14 @@ class _FeaturedCarouselState
                                     ),
                                     backgroundColor:
                                         WidgetStateProperty
-                                            .resolveWith<Color?>(
+                                            .resolveWith<
+                                                Color?>(
                                       (states) {
                                         if (states.contains(
                                           WidgetState.hovered,
                                         )) {
-                                          return Theme.of(context)
+                                          return Theme.of(
+                                                  context)
                                               .colorScheme
                                               .primary
                                               .withValues(

@@ -14,7 +14,10 @@ import '../widgets/poster_image.dart';
 import 'watch_screen.dart';
 
 class DetailsScreen extends StatefulWidget {
-  const DetailsScreen({super.key, required this.item});
+  const DetailsScreen({
+    super.key,
+    required this.item,
+  });
 
   static const routeName = '/details';
 
@@ -26,12 +29,14 @@ class DetailsScreen extends StatefulWidget {
 
 class _DetailsScreenState extends State<DetailsScreen> {
   late Future<MediaDetails> future;
+
   int selectedSeason = 1;
   Future<List<Episode>>? episodesFuture;
 
   @override
   void initState() {
     super.initState();
+
     future = context.read<TmdbApiService>().getDetails(
           widget.item.id,
           widget.item.type,
@@ -41,6 +46,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
   void _loadEpisodes(int season) {
     setState(() {
       selectedSeason = season;
+
       episodesFuture = context.read<TmdbApiService>().getSeason(
             widget.item.id,
             season,
@@ -55,21 +61,31 @@ class _DetailsScreenState extends State<DetailsScreen> {
         future: future,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
           }
+
           if (snapshot.hasError) {
             return ErrorState(
-              message: snapshot.error.toString().replaceFirst('ApiException: ', ''),
-              onRetry: () => setState(() {
-                future = context.read<TmdbApiService>().getDetails(
-                      widget.item.id,
-                      widget.item.type,
-                    );
-              }),
+              message: snapshot.error
+                  .toString()
+                  .replaceFirst('ApiException: ', ''),
+              onRetry: () {
+                setState(() {
+                  future = context
+                      .read<TmdbApiService>()
+                      .getDetails(
+                        widget.item.id,
+                        widget.item.type,
+                      );
+                });
+              },
             );
           }
 
           final details = snapshot.data!;
+
           return _DetailsBody(
             details: details,
             selectedSeason: selectedSeason,
@@ -102,6 +118,10 @@ class _DetailsBody extends StatelessWidget {
 
     return CustomScrollView(
       slivers: [
+        // ======================================================
+        // HEADER
+        // ======================================================
+
         SliverToBoxAdapter(
           child: SizedBox(
             height: 430,
@@ -111,6 +131,8 @@ class _DetailsBody extends StatelessWidget {
                   path: details.backdropPath ?? details.posterPath,
                   height: 430,
                 ),
+
+                // BACK BUTTON
                 Positioned(
                   top: MediaQuery.paddingOf(context).top + 8,
                   left: 14,
@@ -118,10 +140,15 @@ class _DetailsBody extends StatelessWidget {
                     backgroundColor: Colors.black54,
                     child: IconButton(
                       onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.arrow_back_rounded),
+                      icon: const Icon(
+                        Icons.arrow_back_rounded,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
+
+                // POSTER + TITLE
                 Positioned(
                   left: 20,
                   right: 20,
@@ -145,6 +172,7 @@ class _DetailsBody extends StatelessWidget {
                           maxLines: 3,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
+                            color: Colors.white,
                             fontSize: 27,
                             height: 1.05,
                             fontWeight: FontWeight.w900,
@@ -158,16 +186,35 @@ class _DetailsBody extends StatelessWidget {
             ),
           ),
         ),
+
+        // ======================================================
+        // CONTENT
+        // ======================================================
+
         SliverPadding(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
+          padding: const EdgeInsets.fromLTRB(
+            20,
+            20,
+            20,
+            40,
+          ),
           sliver: SliverList(
             delegate: SliverChildListDelegate([
+              // META
               Wrap(
                 spacing: 12,
                 runSpacing: 8,
                 children: [
-                  _meta(context, Icons.star_rounded, details.rating.toStringAsFixed(1)),
-                  _meta(context, Icons.calendar_month_outlined, details.year),
+                  _meta(
+                    context,
+                    Icons.star_rounded,
+                    details.rating.toStringAsFixed(1),
+                  ),
+                  _meta(
+                    context,
+                    Icons.calendar_month_outlined,
+                    details.year,
+                  ),
                   _meta(
                     context,
                     Icons.category_outlined,
@@ -181,7 +228,10 @@ class _DetailsBody extends StatelessWidget {
                     ),
                 ],
               ),
+
               const SizedBox(height: 18),
+
+              // GENRES
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
@@ -194,112 +244,193 @@ class _DetailsBody extends StatelessWidget {
                     )
                     .toList(),
               ),
+
               const SizedBox(height: 20),
+
+              // OVERVIEW
               Text(
                 'Overview',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                style: Theme.of(context)
+                    .textTheme
+                    .titleLarge
+                    ?.copyWith(
                       fontWeight: FontWeight.w900,
                     ),
               ),
+
               const SizedBox(height: 8),
+
               Text(
                 details.overview.isEmpty
                     ? 'No overview is available for this title.'
                     : details.overview,
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onBackground.withOpacity(0.7),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.7),
                   height: 1.55,
                   fontSize: 15,
                 ),
               ),
+
               const SizedBox(height: 22),
-             Row(
-  children: [
-    if (details.trailerKey != null &&
-        details.trailerKey!.isNotEmpty)
-      SizedBox(
-        height: 40,
-        width: 120,
-        child: OutlinedButton.icon(
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => WatchScreen(
-                title: details.title,
-                trailerKey: details.trailerKey,
+
+              // ==================================================
+              // TRAILER + HEART
+              // ==================================================
+
+              Row(
+                children: [
+                  // TRAILER BUTTON
+                  // NO CHANGE
+                  if (details.trailerKey != null &&
+                      details.trailerKey!.isNotEmpty)
+                    SizedBox(
+                      height: 40,
+                      width: 120,
+                      child: OutlinedButton.icon(
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => WatchScreen(
+                              title: details.title,
+                              trailerKey: details.trailerKey,
+                            ),
+                          ),
+                        ),
+                        icon: const Icon(
+                          Icons.movie_filter_rounded,
+                          size: 18,
+                        ),
+                        label: const Text('Trailer'),
+                      ),
+                    ),
+
+                  if (details.trailerKey != null &&
+                      details.trailerKey!.isNotEmpty)
+                    const SizedBox(width: 10),
+
+                  // ==================================================
+                  // HEART BUTTON
+                  // ==================================================
+
+                  IconButton(
+                    onPressed: () => watchlist.toggle(details),
+                    style: IconButton.styleFrom(
+                      backgroundColor: saved
+                          ? Colors.red.withValues(alpha: 0.12)
+                          : Theme.of(context)
+                              .colorScheme
+                              .secondaryContainer,
+                    ),
+                    icon: Icon(
+                      saved
+                          ? Icons.favorite_rounded
+                          : Icons.favorite_border_rounded,
+
+                      // SAVED = ALWAYS RED
+                      color: saved
+                          ? Colors.red
+                          : Theme.of(context)
+                              .colorScheme
+                              .onSecondaryContainer,
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ),
-          icon: const Icon(
-            Icons.movie_filter_rounded,
-            size: 18,
-          ),
-          label: const Text('Trailer'),
-        ),
-      ),
 
-    if (details.trailerKey != null &&
-        details.trailerKey!.isNotEmpty)
-      const SizedBox(width: 10),
+              // ==================================================
+              // CAST
+              // ==================================================
 
-    IconButton.filledTonal(
-      onPressed: () => watchlist.toggle(details),
-      icon: Icon(
-        saved
-            ? Icons.favorite_rounded
-            : Icons.favorite_border_rounded,
-      ),
-    ),
-  ],
-),
               if (details.cast.isNotEmpty) ...[
                 const SizedBox(height: 28),
+
                 Text(
                   'Cast',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleLarge
+                      ?.copyWith(
                         fontWeight: FontWeight.w900,
                       ),
                 ),
+
                 const SizedBox(height: 10),
+
                 Text(
                   details.cast.join(' • '),
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.onBackground.withOpacity(0.7),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.7),
                     height: 1.5,
                   ),
                 ),
               ],
+
+              // ==================================================
+              // EPISODES
+              // ==================================================
+
               if (details.type == MediaType.tv) ...[
                 const SizedBox(height: 30),
+
                 Text(
                   'Episodes',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleLarge
+                      ?.copyWith(
                         fontWeight: FontWeight.w900,
                       ),
                 ),
+
                 const SizedBox(height: 10),
+
                 _SeasonSelector(
                   count: details.numberOfSeasons ?? 1,
                   selected: selectedSeason,
                   onSelected: onSeasonSelected,
                 ),
+
                 const SizedBox(height: 12),
+
                 _EpisodeList(
                   future: episodesFuture ??
-                      Future.value(const <Episode>[]),
+                      Future.value(
+                        const <Episode>[],
+                      ),
                   showPrompt: episodesFuture == null,
                 ),
               ],
+
+              // ==================================================
+              // SIMILAR
+              // ==================================================
+
               if (details.similar.isNotEmpty) ...[
                 const SizedBox(height: 26),
+
                 Text(
                   'You May Also Like',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleLarge
+                      ?.copyWith(
                         fontWeight: FontWeight.w900,
                       ),
                 ),
+
                 const SizedBox(height: 12),
-                HorizontalMediaList(items: details.similar, height: 270, showNavArrows: true),
+
+                HorizontalMediaList(
+                  items: details.similar,
+                  height: 270,
+                  showNavArrows: true,
+                ),
               ],
             ]),
           ),
@@ -308,17 +439,32 @@ class _DetailsBody extends StatelessWidget {
     );
   }
 
-  Widget _meta(BuildContext context, IconData icon, String label) {
+  Widget _meta(
+    BuildContext context,
+    IconData icon,
+    String label,
+  ) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 17, color: Theme.of(context).colorScheme.onBackground.withOpacity(0.54)),
+        Icon(
+          icon,
+          size: 17,
+          color: Theme.of(context)
+              .colorScheme
+              .onSurface
+              .withValues(alpha: 0.54),
+        ),
         const SizedBox(width: 5),
         Text(label),
       ],
     );
   }
 }
+
+// ======================================================
+// SEASON SELECTOR
+// ======================================================
 
 class _SeasonSelector extends StatelessWidget {
   const _SeasonSelector({
@@ -338,9 +484,11 @@ class _SeasonSelector extends StatelessWidget {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: count,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, __) =>
+            const SizedBox(width: 8),
         itemBuilder: (_, index) {
           final season = index + 1;
+
           return ChoiceChip(
             label: Text('Season $season'),
             selected: season == selected,
@@ -351,6 +499,10 @@ class _SeasonSelector extends StatelessWidget {
     );
   }
 }
+
+// ======================================================
+// EPISODE LIST
+// ======================================================
 
 class _EpisodeList extends StatelessWidget {
   const _EpisodeList({
@@ -368,7 +520,12 @@ class _EpisodeList extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Text(
           'Select a season above to load episodes.',
-          style: TextStyle(color: Theme.of(context).colorScheme.onBackground.withOpacity(0.54)),
+          style: TextStyle(
+            color: Theme.of(context)
+                .colorScheme
+                .onSurface
+                .withValues(alpha: 0.54),
+          ),
         ),
       );
     }
@@ -376,24 +533,41 @@ class _EpisodeList extends StatelessWidget {
     return FutureBuilder<List<Episode>>(
       future: future,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+        if (snapshot.connectionState ==
+            ConnectionState.waiting) {
           return const Padding(
             padding: EdgeInsets.all(24),
-            child: Center(child: CircularProgressIndicator()),
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
           );
         }
+
         if (snapshot.hasError) {
           return Text(
-            snapshot.error.toString().replaceFirst('ApiException: ', ''),
-            style: TextStyle(color: Theme.of(context).colorScheme.onBackground.withOpacity(0.54)),
+            snapshot.error
+                .toString()
+                .replaceFirst('ApiException: ', ''),
+            style: TextStyle(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.54),
+            ),
           );
         }
 
         final episodes = snapshot.data ?? [];
+
         if (episodes.isEmpty) {
           return Text(
             'No episodes available for this season.',
-            style: TextStyle(color: Theme.of(context).colorScheme.onBackground.withOpacity(0.54)),
+            style: TextStyle(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.54),
+            ),
           );
         }
 
@@ -401,9 +575,12 @@ class _EpisodeList extends StatelessWidget {
           children: episodes
               .map(
                 (episode) => Card(
-                  margin: const EdgeInsets.only(bottom: 10),
+                  margin: const EdgeInsets.only(
+                    bottom: 10,
+                  ),
                   child: ListTile(
-                    contentPadding: const EdgeInsets.all(10),
+                    contentPadding:
+                        const EdgeInsets.all(10),
                     leading: PosterImage(
                       path: episode.stillPath,
                       width: 110,
@@ -412,7 +589,9 @@ class _EpisodeList extends StatelessWidget {
                     ),
                     title: Text(
                       '${episode.episodeNumber}. ${episode.name}',
-                      style: const TextStyle(fontWeight: FontWeight.w800),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                     subtitle: Text(
                       episode.overview.isEmpty
@@ -423,7 +602,11 @@ class _EpisodeList extends StatelessWidget {
                     ),
                     trailing: episode.runtime == null
                         ? null
-                        : Text(formatRuntime(episode.runtime)),
+                        : Text(
+                            formatRuntime(
+                              episode.runtime,
+                            ),
+                          ),
                   ),
                 ),
               )

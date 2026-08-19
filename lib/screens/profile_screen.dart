@@ -38,11 +38,12 @@ class ProfileScreen extends StatelessWidget {
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(24),
-              gradient: LinearGradient(
-                colors: [
-                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.28),
-                  const Color(0xFF171A21),
-                ],
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF111319)
+                  : Colors.white,
+              border: Border.all(
+                color: Colors.red,
+                width: 2,
               ),
             ),
             child: Row(
@@ -73,7 +74,11 @@ class ProfileScreen extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         auth.email,
-                        style: TextStyle(color: Theme.of(context).colorScheme.onBackground.withOpacity(0.6)),
+                        style: TextStyle(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onBackground
+                                .withOpacity(0.6)),
                       ),
                     ],
                   ),
@@ -87,21 +92,23 @@ class ProfileScreen extends StatelessWidget {
             icon: Icons.edit_outlined,
             title: 'Edit Profile',
             subtitle: 'Update your display information',
-            onTap: () => _showInfo(context, 'Profile editing can be connected to Firebase later.'),
+            onTap: () => _editProfile(context),
           ),
           _item(
             context,
             icon: Icons.favorite_border_rounded,
             title: 'My Watchlist',
             subtitle: '$count saved title${count == 1 ? '' : 's'}',
-            onTap: () => _showInfo(context, 'Use the Watchlist tab to manage saved titles.'),
+            onTap: () => _showInfo(
+                context, 'Use the Watchlist tab to manage saved titles.'),
           ),
           _item(
             context,
             icon: Icons.settings_outlined,
             title: 'App Settings',
             subtitle: 'Theme and app preferences',
-            onTap: () => _showInfo(context, 'The project currently uses a premium dark Material 3 theme.'),
+            onTap: () => _showInfo(context,
+                'The project currently uses a premium dark Material 3 theme.'),
           ),
           _item(
             context,
@@ -146,7 +153,8 @@ class ProfileScreen extends StatelessWidget {
           width: 44,
           height: 44,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
+            color:
+                Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(13),
           ),
           child: Icon(icon),
@@ -157,6 +165,80 @@ class ProfileScreen extends StatelessWidget {
         onTap: onTap,
       ),
     );
+  }
+
+  Future<void> _editProfile(BuildContext context) async {
+    final auth = context.read<AuthProvider>();
+
+    final controller = TextEditingController(
+      text: auth.name,
+    );
+
+    final name = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Edit Profile'),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            textInputAction: TextInputAction.done,
+            decoration: const InputDecoration(
+              labelText: 'Name',
+              prefixIcon: Icon(Icons.person_outline_rounded),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                final value = controller.text.trim();
+
+                if (value.isEmpty) {
+                  return;
+                }
+
+                Navigator.of(dialogContext).pop(value);
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+
+    controller.dispose();
+
+    if (name == null || name.trim().isEmpty) {
+      return;
+    }
+
+    try {
+      await auth.updateProfile(
+        name: name.trim(),
+      );
+
+      if (!context.mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Profile updated successfully.'),
+        ),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to update profile: $e'),
+        ),
+      );
+    }
   }
 
   void _showInfo(BuildContext context, String message) {

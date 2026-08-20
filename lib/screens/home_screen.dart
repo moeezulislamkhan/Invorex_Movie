@@ -88,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // Change quote every 30 minutes.
     _subtitleTimer = Timer.periodic(
-      const Duration(minutes: 30),
+      const Duration(minutes: 5),
       (_) {
         if (!mounted) return;
 

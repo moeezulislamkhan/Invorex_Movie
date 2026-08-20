@@ -115,7 +115,150 @@ class _AuthScreenState extends State<AuthScreen> {
       SnackBar(content: Text(message)),
     );
   }
+  Future<void> _showForgotPasswordDialog() async {
+    final controller = TextEditingController(
+      text: emailController.text.trim(),
+    );
 
+    bool sending = false;
+
+    await showDialog(
+      context: context,
+      barrierDismissible: !sending,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text(
+                'Forgot Password?',
+                style: TextStyle(
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Enter your registered email address. '
+                    'We will send you a password reset link.',
+                    style: TextStyle(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.65),
+                    ),
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  TextField(
+                    controller: controller,
+                    keyboardType: TextInputType.emailAddress,
+                    autofocus: true,
+                    enabled: !sending,
+                    decoration: const InputDecoration(
+                      labelText: 'Email',
+                      hintText: 'example@email.com',
+                      prefixIcon: Icon(
+                        Icons.email_outlined,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              actions: [
+                TextButton(
+                  onPressed: sending
+                      ? null
+                      : () {
+                          Navigator.pop(dialogContext);
+                        },
+                  child: const Text('Cancel'),
+                ),
+
+                FilledButton(
+                  onPressed: sending
+                      ? null
+                      : () async {
+                          final email =
+                              controller.text.trim();
+
+                          if (email.isEmpty ||
+                              !email.contains('@')) {
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Please enter a valid email address.',
+                                ),
+                              ),
+                            );
+                            return;
+                          }
+
+                          setDialogState(() {
+                            sending = true;
+                          });
+
+                          try {
+                            await context
+                                .read<AuthProvider>()
+                                .resetPassword(
+                                  email: email,
+                                );
+
+                            if (!context.mounted) return;
+
+                            Navigator.pop(dialogContext);
+
+                            _show(
+                              'Password reset link has been sent to your email.',
+                            );
+                          } catch (e) {
+                            if (!context.mounted) return;
+
+                            setDialogState(() {
+                              sending = false;
+                            });
+
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  e
+                                      .toString()
+                                      .replaceFirst(
+                                        'Exception: ',
+                                        '',
+                                      ),
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                  child: sending
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child:
+                              CircularProgressIndicator(
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text('Send Link'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    controller.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -208,16 +351,14 @@ class _AuthScreenState extends State<AuthScreen> {
                       ),
                     ),
                   ],
-                  if (loginMode)
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () => _show(
-                          'For this prototype, use your registered email and any 4+ character password.',
-                        ),
-                        child: const Text('Forgot Password?'),
-                      ),
-                    )
+                 if (loginMode)
+  Align(
+    alignment: Alignment.centerRight,
+    child: TextButton(
+      onPressed: loading ? null : _showForgotPasswordDialog,
+      child: const Text('Forgot Password?'),
+    ),
+  )
                   else
                     const SizedBox(height: 20),
                   const SizedBox(height: 4),

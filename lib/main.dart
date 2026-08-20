@@ -12,7 +12,6 @@ import 'providers/theme_provider.dart';
 import 'screens/details_screen.dart';
 import 'screens/splash_screen.dart';
 import 'services/local_storage_service.dart';
-import 'services/mux_video_api_service.dart';
 import 'services/tmdb_api_service.dart';
 import 'theme/app_theme.dart';
 
@@ -29,7 +28,6 @@ Future<void> main() async {
   await auth.load();
 
   final api = TmdbApiService();
-  final muxApi = MuxVideoApiService();
 
   final theme = ThemeProvider(storage);
   await theme.load();
@@ -39,7 +37,6 @@ Future<void> main() async {
       providers: [
         Provider<LocalStorageService>.value(value: storage),
         Provider<TmdbApiService>.value(value: api),
-        Provider<MuxVideoApiService>.value(value: muxApi),
         ChangeNotifierProvider<AuthProvider>.value(value: auth),
         ChangeNotifierProvider<ThemeProvider>.value(value: theme),
         ChangeNotifierProvider(create: (_) => HomeProvider(api)),

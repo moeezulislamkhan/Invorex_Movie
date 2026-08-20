@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:invorex_movies/config/app_config.dart';
-import 'package:invorex_movies/services/mux_video_api_service.dart';
 
 void main() {
-  testWidgets('app exposes the MUX configuration', (tester) async {
+  testWidgets('app exposes the app name and TMDB config', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -19,9 +18,8 @@ void main() {
     expect(find.text(AppConfig.appName), findsOneWidget);
   });
 
-  test('uses the configured MUX video environment key', () {
-    expect(AppConfig.muxEnvironmentKey, 'sl8n1m2ua5tglem2ntg9nhd0f');
-    expect(MuxVideoApiService, isNotNull);
-    expect(AppConfig.isMuxConfigured, isTrue);
+  test('keeps the app configured for TMDB only', () {
+    expect(AppConfig.tmdbBearerToken.isNotEmpty, isTrue);
+    expect(AppConfig.isApiConfigured, isTrue);
   });
 }

@@ -37,43 +37,6 @@ class MediaCard extends StatelessWidget {
                     borderRadius: 18,
                   ),
                 ),
-                // Play button overlay
-                Positioned.fill(
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => WatchScreen(
-                            title: item.title,
-                            videoId: item.muxVideoId,
-                          ),
-                        ),
-                      ),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.black26,
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        child: Center(
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.primary,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.play_arrow_rounded,
-                              color: Colors.white,
-                              size: 28,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
               ],
             ),
           ),

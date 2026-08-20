@@ -1,78 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import '../services/mux_video_api_service.dart';
-import 'video_player_screen.dart';
 
 class WatchScreen extends StatefulWidget {
   const WatchScreen({
     super.key,
     this.title,
     this.trailerKey,
-    this.videoId,
   });
 
   final String? title;
   final String? trailerKey;
-  final String? videoId;
 
   @override
   State<WatchScreen> createState() => _WatchScreenState();
 }
 
 class _WatchScreenState extends State<WatchScreen> {
-  String? _playbackUrl;
-  bool _isLoadingMuxVideo = false;
   String? _errorMessage;
-
-  @override
-  void initState() {
-    super.initState();
-    // If we have a video ID, try to load the MUX video
-    if (widget.videoId != null && widget.videoId!.isNotEmpty) {
-      _loadMuxVideo();
-    }
-  }
-
-  Future<void> _loadMuxVideo() async {
-    setState(() {
-      _isLoadingMuxVideo = true;
-      _errorMessage = null;
-    });
-
-    try {
-      final muxService = context.read<MuxVideoApiService>();
-      final playbackUrl = await muxService.getPlaybackUrl(widget.videoId!);
-
-      if (mounted) {
-        setState(() {
-          _playbackUrl = playbackUrl;
-          _isLoadingMuxVideo = false;
-        });
-
-        // Navigate to video player screen
-        if (_playbackUrl != null) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => VideoPlayerScreen(
-                videoUrl: _playbackUrl!,
-                title: widget.title ?? 'Video Player',
-              ),
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isLoadingMuxVideo = false;
-          _errorMessage = e.toString();
-        });
-      }
-    }
-  }
 
   Future<void> _openTrailer(BuildContext context) async {
     if (widget.trailerKey == null || widget.trailerKey!.isEmpty) {
@@ -106,18 +50,7 @@ class _WatchScreenState extends State<WatchScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Watch')),
-      body: _isLoadingMuxVideo
-          ? const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Loading video...'),
-                ],
-              ),
-            )
-          : Padding(
+      body: Padding(
               padding: const EdgeInsets.all(20),
               child: SingleChildScrollView(
                 child: Column(
@@ -176,31 +109,16 @@ class _WatchScreenState extends State<WatchScreen> {
                       )
                     else
                       Text(
-                        widget.videoId != null
-                            ? 'Click the play button to watch the video. This streams from MUX Video API.'
-                            : 'This button opens the trailer from its legal external video source. Invorex Movies does not host or distribute copyrighted movie files.',
+                        widget.trailerKey != null && widget.trailerKey!.isNotEmpty
+                            ? 'This button opens the trailer from its legal external video source. Invorex Movies does not host or distribute copyrighted movie files.'
+                            : 'No official trailer is available for this title right now.',
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                           height: 1.5,
                         ),
                       ),
                     const SizedBox(height: 20),
-                    if (widget.videoId != null && widget.videoId!.isNotEmpty)
-                      SizedBox(
-                        width: double.infinity,
-                        child: FilledButton.icon(
-                          onPressed: _isLoadingMuxVideo ? null : _loadMuxVideo,
-                          icon: _isLoadingMuxVideo
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
-                                )
-                              : const Icon(Icons.play_circle_filled_rounded),
-                          label: Text(_isLoadingMuxVideo ? 'Loading...' : 'Play Video'),
-                        ),
-                      )
-                    else if (widget.trailerKey != null && widget.trailerKey!.isNotEmpty)
+                    if (widget.trailerKey != null && widget.trailerKey!.isNotEmpty)
                       SizedBox(
                         width: double.infinity,
                         child: FilledButton.icon(
@@ -215,7 +133,7 @@ class _WatchScreenState extends State<WatchScreen> {
                         child: FilledButton.icon(
                           onPressed: null,
                           icon: const Icon(Icons.block),
-                          label: const Text('Video Not Available'),
+                          label: const Text('Trailer Not Available'),
                         ),
                       ),
                   ],

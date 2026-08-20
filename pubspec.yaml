@@ -20,11 +20,14 @@ dependencies:
   cloud_firestore: ^6.0.2
   shared_preferences: ^2.5.3
   url_launcher: ^6.3.2
-
+  firebase_core: ^4.1.1
   video_player: ^2.8.1
   chewie: ^1.14.1
+<<<<<<< HEAD
   path_provider: ^2.1.6
 
+=======
+>>>>>>> main
 dev_dependencies:
   flutter_test:
     sdk: flutter
